@@ -1,11 +1,12 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include <vector>
 
 class Handler {
 public:
-    virtual bool CanHandle(const std::string& arg) = 0;
+    virtual bool CanHandle(std::string_view arg) = 0;
     virtual bool Handle(int& i, int argc, char** argv) = 0;
     virtual ~Handler() = default;
 
@@ -16,7 +17,7 @@ protected:
 class StringHandler : public Handler {
 public:
     StringHandler(std::string& str, std::vector<std::string> names);
-    bool CanHandle(const std::string& arg) override;
+    bool CanHandle(std::string_view arg) override;
     bool Handle(int& i, int argc, char** argv) override;
 
 private:
@@ -27,7 +28,7 @@ private:
 class FlagHandler : public Handler {
 public:
     FlagHandler(bool& flag, std::vector<std::string> names);
-    bool CanHandle(const std::string& arg) override;
+    bool CanHandle(std::string_view arg) override;
     bool Handle(int& i, int argc, char** argv) override;
 
 private:
@@ -38,7 +39,7 @@ private:
 class NumericHandler : public Handler {
 public:
     NumericHandler(std::size_t& number, std::vector<std::string> names);
-    bool CanHandle(const std::string& arg) override;
+    bool CanHandle(std::string_view arg) override;
     bool Handle(int& i, int argc, char** argv) override;
     bool IsNamed(const std::string& arg) const;
 
