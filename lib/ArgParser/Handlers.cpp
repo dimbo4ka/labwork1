@@ -12,7 +12,7 @@ bool Handler::HasNext(int i, int argc) {
 StringHandler::StringHandler(std::string& str, std::vector<std::string> names)
     : str_(str), names_(std::move(names)) {}
 
-bool StringHandler::CanHandle(const std::string& arg) {
+bool StringHandler::CanHandle(std::string_view arg) {
     return std::find(names_.begin(), names_.end(), arg) != names_.end()
         || std::any_of(names_.begin(), names_.end(), [&](const std::string& name) {
             return arg.starts_with(name + "=");
@@ -37,7 +37,7 @@ bool StringHandler::Handle(int& i, int argc, char** argv) {
 FlagHandler::FlagHandler(bool& flag, std::vector<std::string> names)
     : flag_(flag), names_(std::move(names)) {}
 
-bool FlagHandler::CanHandle(const std::string& arg) {
+bool FlagHandler::CanHandle(std::string_view arg) {
     return std::find(names_.begin(), names_.end(), arg) != names_.end();
 }
 
@@ -54,7 +54,7 @@ bool NumericHandler::ConvertToNumber(const char* str, std::size_t& number) const
     return ec == std::errc{};
 }
 
-bool NumericHandler::CanHandle(const std::string& arg) {
+bool NumericHandler::CanHandle(std::string_view arg) {
     return std::find(names_.begin(), names_.end(), arg) != names_.end()
         || std::any_of(names_.begin(), names_.end(), [&](const std::string& name) {
             return arg.starts_with(name + "=");
