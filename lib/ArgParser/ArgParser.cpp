@@ -4,7 +4,7 @@
 
 ArgParser::ArgParser() {
     AddHandler<StringHandler>(output_file_, {"-o", "--output"});
-    AddHandler<FlagHandler>(print_, {"-p", "--print"});
+    AddHandler<FlagHandler>(must_print_, {"-p", "--print"});
     AddHandler<NumericHandler>(stats_, {"-s", "--stats"});
     AddHandler<NumericHandler>(window_size_, {"-w", "--window"});
     AddHandler<NumericHandler>(from_, {"-f", "--from"});
@@ -30,4 +30,8 @@ bool ArgParser::Parse(int argc, char** argv) {
         }
     }
     return true;
+}
+
+ParserConfig ArgParser::GetConfig() const {
+    return {output_file_, stats_, window_size_, from_, to_, must_print_};
 }

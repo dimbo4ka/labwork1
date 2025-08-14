@@ -17,16 +17,19 @@ struct WindowParams {
 
 class LogAnalyzer {
 public:
-    LogAnalyzer(const std::string& filename);
-
     void Analyze();
-    auto GetTop5xxRequests(std::size_t n) const 
-            -> std::vector<std::pair<std::string, std::size_t>>;
-    bool WriteErrors(const std::string& filename, bool need_print = false) const;
-    WindowParams CalculateWindowWithMaxRequestCount(std::size_t window_size);
+    bool OpenFile(const std::string& filename);
 
+    bool WriteErrors(std::ostream&, std::size_t n) const;
+    bool WriteErrors(const std::string& filename, std::size_t n) const;
+    WindowParams CalculateWindowWithMaxRequestCount(
+            std::size_t window_size, std::size_t from, std::size_t to);
+    
 private:
     std::vector<LogEntry> entries_;
     std::ifstream log_file;
     LogParser log_parser;
+
+    auto GetTop5xxRequests(std::size_t n) const 
+            -> std::vector<std::pair<std::string, std::size_t>>;
 };

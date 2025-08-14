@@ -1,12 +1,8 @@
-#include "lib/ArgParser/ArgParser.hpp"
-
-#include <iostream>
+#include "lib/Application/Application.hpp"
 
 int main(int argc, char** argv) {
-    ArgParser parser;
-    if (!parser.Parse(argc, argv)) {
-        std::cerr << "Failed to parse arguments." << std::endl;
+    Application app;
+    if (!app.Run(argc, argv))
         return 1;
-    }
     return 0;
 }
