@@ -4,12 +4,6 @@
 #include <iostream>
 #include <fstream>
 
-LogAnalyzer::LogAnalyzer(const std::string& filename) 
-        : log_file(filename, std::ios::app) {
-    if (!log_file.is_open())
-        throw std::runtime_error("Could not open log file: " + filename);
-}
-
 void LogAnalyzer::Analyze() {
     std::string line;
     while (std::getline(log_file, line)) {
@@ -18,6 +12,15 @@ void LogAnalyzer::Analyze() {
             continue;
         entries_.push_back(std::move(*entry));
     }
+}
+
+bool LogAnalyzer::OpenFile(const std::string& filename) {
+    log_file.open(filename);
+    if (!log_file.is_open()) {
+        std::cerr << "Could not open logfile: " << filename << std::endl;
+        return false;
+    }
+    return true;
 }
 
 auto LogAnalyzer::GetTop5xxRequests(std::size_t n) const
@@ -38,31 +41,24 @@ auto LogAnalyzer::GetTop5xxRequests(std::size_t n) const
     return top_requests;
 }
 
-bool LogAnalyzer::WriteErrors(const std::string& filename, bool need_print) const {
+bool LogAnalyzer::WriteErrors(std::ostream& out, std::size_t n) const {
+    for (auto [request, frequency] : GetTop5xxRequests(n)) {
+        std::cout << request << " | frequency = " << frequency << std::endl;
+    }
+    return true;
+}
+
+bool LogAnalyzer::WriteErrors(const std::string& filename, std::size_t n) const {
     std::ofstream error_file(filename);
     if (!error_file.is_open()) {
         std::cout << "Could not open file: " << filename << std::endl;
         return false;
     }
-    
-    for (std::size_t i = 1; const auto& entry : entries_) {
-        if (entry.status >= 500 && entry.status <= 599) {
-            error_file << i << ". "
-                       << entry.ip << " " << entry.request << " "
-                       << entry.timestamp << " " << entry.status << "\n";
-            if (need_print) {
-                std::cout << i << ". "
-                          << entry.ip << " " << entry.request << " "
-                          << entry.timestamp << " " << entry.status << std::endl;
-            }
-            ++i;
-        }
-    }
-
-    return true;
+    return WriteErrors(error_file, n);
 }
 
-WindowParams LogAnalyzer::CalculateWindowWithMaxRequestCount(std::size_t window_size) {
+WindowParams LogAnalyzer::CalculateWindowWithMaxRequestCount(
+        std::size_t window_size, std::size_t from, std::size_t to) {
     std::sort(entries_.begin(), entries_.end(),
             [](const LogEntry& a, const LogEntry& b) {
                 return a.timestamp < b.timestamp;
@@ -71,6 +67,12 @@ WindowParams LogAnalyzer::CalculateWindowWithMaxRequestCount(std::size_t window_
     WindowParams window_params;
     std::size_t l = 0;
     for (std::size_t r = 0; r < entries_.size(); ++r) {
+        if (entries_[r].timestamp > to)
+            break;
+        if (entries_[l].timestamp < from) {
+            ++l;
+            continue;
+        }
         while (entries_[r].timestamp - entries_[l].timestamp > window_size) {
             ++l;
         }

@@ -8,10 +8,20 @@
 
 #include "Handlers.hpp"
 
+struct ParserConfig {
+    std::string output_file;
+    std::size_t stats;
+    std::size_t window_size;
+    std::size_t from;
+    std::size_t to;
+    bool must_print;
+};
+
 class ArgParser {
 public:
     ArgParser();
     bool Parse(int argc, char** argv);
+    ParserConfig GetConfig() const;
 
 private:
     std::vector<std::unique_ptr<Handler>> handlers_;
@@ -20,7 +30,7 @@ private:
     std::size_t window_size_ = 0;
     std::size_t from_ = 0;
     std::size_t to_ = std::numeric_limits<std::size_t>::max();
-    bool print_ = false;
+    bool must_print_ = false;
 
     template<typename T>
     void AddHandler(auto& variable, std::vector<std::string> names);

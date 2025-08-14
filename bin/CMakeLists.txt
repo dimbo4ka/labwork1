@@ -5,4 +5,4 @@ target_include_directories(
     ${CMAKE_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/lib
     )
-target_link_libraries(${PROJECT_NAME} PUBLIC arg-parser)
+target_link_libraries(${PROJECT_NAME} PUBLIC application)

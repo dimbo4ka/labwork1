@@ -51,7 +51,7 @@ std::size_t LogParser::ParseStatus(std::string_view status) {
 }
 
 std::size_t LogParser::ParseTimeStamp(std::string_view date) {
-    std::istringstream iss(std::string(date));
+    std::istringstream iss((std::string(date)));
     std::chrono::sys_time<std::chrono::seconds> timestamp;
     iss >> std::chrono::parse("%d/%b/%Y:%H:%M:%S %z", timestamp);
     return static_cast<std::size_t>((timestamp.time_since_epoch()).count());
